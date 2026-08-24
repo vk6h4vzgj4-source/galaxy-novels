@@ -3,156 +3,434 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مِجرّة الروايات - عوالم لا حصر لها</title>
-    <!-- استدعاء مكتبة Tailwind CSS للتصميم الاحترافي -->
+    <title>مِجرّة الروايات | العوالم اللانهائية</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- استدعاء خط Cairo العربي الفخم -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: { space: '#030712', primary: '#7c3aed', secondary: '#ec4899' }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #030712; color: #f3f4f6; }
-        .glass-card {
-            background: rgba(17, 24, 39, 0.75);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        body { font-family: 'Cairo', sans-serif; background-color: #030712; color: #e5e7eb; overflow-x: hidden; scroll-behavior: smooth; }
+        
+        /* تأثير النجوم في الخلفية */
+        .stars-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: stars-animation 4s linear infinite;
+            opacity: 0.3;
         }
-        .glow-effect {
-            box-shadow: 0 0 25px -5px rgba(147, 51, 234, 0.3);
+        @keyframes stars-animation { 0% { transform: translateY(0); } 100% { transform: translateY(-200px); } }
+
+        /* تأثير الزجاج الفخم */
+        .glass { 
+            background: rgba(17, 24, 39, 0.6); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
         }
+        
+        /* حركات الكروت */
+        .novel-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .novel-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px -10px rgba(124, 58, 237, 0.4); border-color: rgba(124, 58, 237, 0.5); }
+        
+        .gradient-text { background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* شريط التمرير */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+<body class="antialiased selection:bg-primary selection:text-white relative">
 
-    <!-- شريط التنقل العلوي -->
-    <header class="glass-card sticky top-0 z-50 border-b border-gray-800/80">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer">
-                <span class="text-3xl text-purple-400">✦</span>
-                <h1 class="text-2xl font-black bg-gradient-to-r from-purple-400 via-indigo-300 to-pink-400 bg-clip-text text-transparent">مِجرّة الروايات</h1>
+    <div class="stars-bg"></div>
+    <div class="fixed top-0 left-0 w-full h-full bg-gradient-to-b from-purple-900/10 via-space to-space -z-10"></div>
+
+    <!-- شريط التنقل (Navbar) -->
+    <header class="glass sticky top-0 z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- الشعار -->
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                        <i class="fa-solid fa-book-journal-whills text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-black tracking-tight text-white">مِجرّة <span class="gradient-text">الروايات</span></h1>
+                </div>
+
+                <!-- شريط البحث (مخفي في الجوال، يظهر في الشاشات الكبيرة) -->
+                <div class="hidden md:flex flex-1 max-w-md mx-8 relative">
+                    <input type="text" id="searchInput" placeholder="ابحث عن رواية، كاتب، أو تصنيف..." class="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-full px-6 py-2.5 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all">
+                    <button class="absolute left-3 top-2.5 text-gray-400 hover:text-purple-400"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+
+                <!-- الأزرار -->
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="#" class="text-sm font-semibold text-gray-300 hover:text-white transition">دخول</a>
+                    <a href="#" class="bg-white text-gray-900 hover:bg-gray-200 px-5 py-2.5 rounded-full text-sm font-bold transition transform hover:scale-105">حساب جديد</a>
+                </div>
+
+                <!-- زر القائمة للجوال -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobileMenuBtn" class="text-gray-300 hover:text-white focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
             </div>
-            <nav class="hidden md:flex space-x-8 space-x-reverse text-sm font-semibold text-gray-300">
-                <a href="#" class="hover:text-purple-400 transition">الرئيسية</a>
-                <a href="#library" class="hover:text-purple-400 transition">التصنيفات</a>
-                <a href="#" class="hover:text-purple-400 transition">الأكثر رواجًا</a>
-                <a href="#" class="hover:text-purple-400 transition">من نحن</a>
-            </nav>
-            <div class="flex items-center space-x-3 space-x-reverse">
-                <button class="bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-xl text-sm font-bold border border-gray-700 transition">
-                    تسجيل الدخول
-                </button>
-                <button class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-purple-500/25 transition">
-                    انضم إلينا
-                </button>
+        </div>
+        
+        <!-- قائمة الجوال -->
+        <div id="mobileMenu" class="hidden md:hidden glass border-t border-gray-800">
+            <div class="px-4 pt-4 pb-6 space-y-4">
+                <input type="text" id="searchInputMobile" placeholder="ابحث هنا..." class="w-full bg-gray-900/80 border border-gray-700 text-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:border-purple-500">
+                <a href="#" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg">دخول</a>
+                <a href="#" class="block px-3 py-2 text-base font-medium text-center bg-purple-600 text-white rounded-lg">حساب جديد</a>
             </div>
         </div>
     </header>
 
-    <!-- الواجهة الرئيسية (Hero) -->
-    <main class="flex-grow">
-        <section class="relative overflow-hidden py-20 lg:py-32 px-4">
-            <div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/30 via-gray-950 to-gray-950"></div>
-            <div class="max-w-5xl mx-auto text-center">
-                <div class="inline-flex items-center space-x-2 space-x-reverse px-4 py-1.5 rounded-full glass-card text-purple-300 text-xs font-bold mb-8 border border-purple-500/30">
-                    <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-                    <span>روايات وحلقات جديدة تُضاف أسبوعياً</span>
+    <main>
+        <!-- قسم الترحيب (Hero Section) -->
+        <section class="relative pt-24 pb-32 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-purple-500/30 text-purple-300 text-sm font-bold mb-8 animate-bounce">
+                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                    نظام القراءة متصل الآن
                 </div>
-                <h2 class="text-4xl sm:text-6xl font-black tracking-tight mb-6 leading-tight">
-                    رحلتك إلى <span class="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">عوالم لا حصر لها</span> تبدأ هنا
+                <h2 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+                    استكشف <span class="gradient-text">عوالم الخيال</span><br>بلا حدود
                 </h2>
-                <p class="text-gray-300 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-                    مكتبة رقمية تضم أروع الروايات العربية والعالمية، من الفانتازيا والغموض إلى الخيال العلمي، بتجربة قراءة مذهلة.
+                <p class="mt-4 text-xl text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed">
+                    مكتبتك الشخصية لأعظم الروايات المترجمة والحصرية. من أروقة الغموض النفسي إلى عوالم الفانتازيا المظلمة، كل فصل هو رحلة جديدة.
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="#library" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-purple-600/30 transition transform hover:-translate-y-0.5 text-center">
-                        ابدأ القراءة الآن ←
-                    </a>
-                    <a href="#library" class="glass-card hover:bg-white/10 text-white font-bold px-8 py-4 rounded-xl transition text-center">
-                        تصفّح المكتبة
-                    </a>
+                    <button onclick="document.getElementById('library').scrollIntoView()" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg shadow-purple-600/25 transition transform hover:-translate-y-1">
+                        تصفح المكتبة <i class="fa-solid fa-arrow-left ml-2"></i>
+                    </button>
+                    <button class="glass hover:bg-gray-800/80 text-white px-8 py-4 rounded-full font-bold text-lg transition">
+                        اكتشف المزيد
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- قسم مكتبة الروايات -->
-        <section id="library" class="max-w-7xl mx-auto px-4 py-16">
-            <div class="text-center mb-12">
-                <span class="text-purple-400 text-sm font-bold uppercase tracking-wider">مكتبتنا</span>
-                <h3 class="text-3xl font-black mt-2">روايات مختارة بعناية</h3>
-                <p class="text-gray-400 mt-1">اكتشف أحدث الفصول وأروع القصص</p>
+        <!-- قسم الإحصائيات -->
+        <section class="border-y border-gray-800/50 glass relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-x-reverse divide-gray-800">
+                    <div><h4 class="text-4xl font-black text-white mb-2">+10K</h4><p class="text-gray-400 text-sm">فصل مترجم</p></div>
+                    <div><h4 class="text-4xl font-black text-white mb-2">+500</h4><p class="text-gray-400 text-sm">رواية حصرية</p></div>
+                    <div><h4 class="text-4xl font-black text-white mb-2">+50K</h4><p class="text-gray-400 text-sm">قارئ نشط</p></div>
+                    <div><h4 class="text-4xl font-black text-white mb-2">24/7</h4><p class="text-gray-400 text-sm">تحديثات مستمرة</p></div>
+                </div>
             </div>
+        </section>
 
-            <!-- شبكة الروايات (الكروت) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- رواية 1 -->
-                <div class="glass-card rounded-2xl overflow-hidden group hover:border-purple-500/50 transition duration-300 transform hover:-translate-y-1">
-                    <div class="h-48 bg-gradient-to-br from-purple-900/60 to-indigo-950 flex items-center justify-center relative overflow-hidden">
-                        <span class="text-6xl group-placeholder group-hover:scale-110 transition duration-300">🌌</span>
-                        <span class="absolute top-3 right-3 bg-purple-500/20 text-purple-300 text-xs font-bold px-3 py-1 rounded-full border border-purple-500/30">فانتازيا</span>
+        <!-- قسم الروايات (المكتبة) -->
+        <section id="library" class="py-24 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                    <div>
+                        <h3 class="text-3xl md:text-4xl font-black mb-3">الروايات <span class="text-purple-500">المميزة</span></h3>
+                        <p class="text-gray-400">أعمال أدبية مختارة بعناية لعشاق الغموض والفانتازيا.</p>
                     </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between text-xs text-purple-400 mb-2 font-semibold">
-                            <span>★ 4.9 (ألف قراءة)</span>
-                            <span>مكتملة</span>
-                        </div>
-                        <h4 class="text-xl font-bold mb-2 group-hover:text-purple-300 transition">لورد الغوامض</h4>
-                        <p class="text-gray-400 text-sm line-clamp-2 mb-4">في عالم يسوده الضباب والآسرار الغامضة، يبدأ بطلنا رحلته في مسارات القوى الخفية...</p>
-                        <button class="w-full bg-gray-800 hover:bg-purple-600 text-gray-200 hover:text-white py-2.5 rounded-xl text-sm font-bold transition duration-200">
-                            اقرأ الفصل الأول
-                        </button>
+                    <!-- أزرار التصنيفات -->
+                    <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                        <button class="filter-btn active bg-purple-600 text-white px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap" data-filter="all">الكل</button>
+                        <button class="filter-btn glass hover:bg-gray-800 text-gray-300 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap" data-filter="mystery">غموض</button>
+                        <button class="filter-btn glass hover:bg-gray-800 text-gray-300 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap" data-filter="fantasy">فانتازيا</button>
+                        <button class="filter-btn glass hover:bg-gray-800 text-gray-300 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap" data-filter="scifi">خيال علمي</button>
                     </div>
                 </div>
 
-                <!-- رواية 2 -->
-                <div class="glass-card rounded-2xl overflow-hidden group hover:border-purple-500/50 transition duration-300 transform hover:-translate-y-1">
-                    <div class="h-48 bg-gradient-to-br from-blue-900/60 to-gray-950 flex items-center justify-center relative overflow-hidden">
-                        <span class="text-6xl group-hover:scale-110 transition duration-300">⚡</span>
-                        <span class="absolute top-3 right-3 bg-blue-500/20 text-blue-300 text-xs font-bold px-3 py-1 rounded-full border border-blue-500/30">غموض وتشويق</span>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between text-xs text-blue-400 mb-2 font-semibold">
-                            <span>★ 4.8 (800 قراءة)</span>
-                            <span>مستمرة</span>
+                <!-- شبكة الروايات (الكروت الاحترافية) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="novelsGrid">
+                    
+                    <!-- كارت: لورد الغوامض -->
+                    <div class="novel-card glass rounded-2xl overflow-hidden group" data-category="mystery">
+                        <div class="relative h-64 bg-gray-900 overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
+                            <!-- صورة افتراضية (أيقونة) -->
+                            <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-50 group-hover:scale-110 transition duration-500 text-purple-500">
+                                <i class="fa-solid fa-eye"></i>
+                            </div>
+                            <div class="absolute top-4 right-4 z-20 flex gap-2">
+                                <span class="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">مستمرة</span>
+                            </div>
+                            <div class="absolute bottom-4 right-4 z-20">
+                                <h4 class="text-2xl font-black text-white mb-1">لورد الغوامض</h4>
+                                <div class="flex items-center gap-2 text-yellow-400 text-sm">
+                                    <i class="fa-solid fa-star"></i> 4.9 <span class="text-gray-300">(أسطورية)</span>
+                                </div>
+                            </div>
                         </div>
-                        <h4 class="text-xl font-bold mb-2 group-hover:text-blue-300 transition">القس المجنون</h4>
-                        <p class="text-gray-400 text-sm line-clamp-2 mb-4">قصة تناضل فيها الشخصية الرئيسية ضد القواعد والأعراف لتحقيق الخلود المطلق...</p>
-                        <button class="w-full bg-gray-800 hover:bg-blue-600 text-gray-200 hover:text-white py-2.5 rounded-xl text-sm font-bold transition duration-200">
-                            اقرأ الفصل الأول
-                        </button>
+                        <div class="p-6">
+                            <p class="text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed">
+                                في عالم مليء بالضباب، الآلات البخارية، والسحر الغامض. يستيقظ "كلاين" ليجد نفسه متورطاً في صراعات الآلهة ومسارات القوى الخفية محاولاً كشف سر العالم.
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-gray-500 bg-gray-800 px-3 py-1 rounded-lg">غموض / انتقال</span>
+                                <button class="text-purple-400 hover:text-purple-300 font-bold text-sm flex items-center gap-1 group-hover:translate-x-reverse group-hover:translate-x-2 transition">
+                                    اقرأ الآن <i class="fa-solid fa-arrow-left text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- كارت: القس المجنون -->
+                    <div class="novel-card glass rounded-2xl overflow-hidden group" data-category="fantasy">
+                        <div class="relative h-64 bg-gray-900 overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
+                            <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-50 group-hover:scale-110 transition duration-500 text-red-500">
+                                <i class="fa-solid fa-skull-crossbones"></i>
+                            </div>
+                            <div class="absolute top-4 right-4 z-20 flex gap-2">
+                                <span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">مكتملة</span>
+                            </div>
+                            <div class="absolute bottom-4 right-4 z-20">
+                                <h4 class="text-2xl font-black text-white mb-1">القس المجنون</h4>
+                                <div class="flex items-center gap-2 text-yellow-400 text-sm">
+                                    <i class="fa-solid fa-star"></i> 4.9 <span class="text-gray-300">(تحفة فنية)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed">
+                                بعد 500 عام من الصراعات، يعود "فانغ يوان" بالزمن باستخدام حشرة تشي الربيع والخريف، متخلياً عن كل المشاعر في سعيه المهووس نحو الخلود المطلق.
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-gray-500 bg-gray-800 px-3 py-1 rounded-lg">فانتازيا / نفسي</span>
+                                <button class="text-purple-400 hover:text-purple-300 font-bold text-sm flex items-center gap-1 group-hover:translate-x-reverse group-hover:translate-x-2 transition">
+                                    اقرأ الآن <i class="fa-solid fa-arrow-left text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- كارت: عبد الظل -->
+                    <div class="novel-card glass rounded-2xl overflow-hidden group" data-category="scifi">
+                        <div class="relative h-64 bg-gray-900 overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
+                            <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-50 group-hover:scale-110 transition duration-500 text-blue-500">
+                                <i class="fa-solid fa-moon"></i>
+                            </div>
+                            <div class="absolute top-4 right-4 z-20 flex gap-2">
+                                <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">مستمرة</span>
+                            </div>
+                            <div class="absolute bottom-4 right-4 z-20">
+                                <h4 class="text-2xl font-black text-white mb-1">عبد الظل</h4>
+                                <div class="flex items-center gap-2 text-yellow-400 text-sm">
+                                    <i class="fa-solid fa-star"></i> 4.8 <span class="text-gray-300">(شهيرة)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed">
+                                عندما يصاب "صاني" بمرض الكابوس، يُسحب إلى عالم مدمر مليء بالوحوش المرعبة. النجاة تعني أن يصبح أيقونة، لكن قدره كان أن يصبح عبدًا لظله.
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-gray-500 bg-gray-800 px-3 py-1 rounded-lg">خيال مظلم / نظام</span>
+                                <button class="text-purple-400 hover:text-purple-300 font-bold text-sm flex items-center gap-1 group-hover:translate-x-reverse group-hover:translate-x-2 transition">
+                                    اقرأ الآن <i class="fa-solid fa-arrow-left text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                     <!-- كارت: كتاب الشمس الجديدة -->
+                    <div class="novel-card glass rounded-2xl overflow-hidden group" data-category="scifi">
+                        <div class="relative h-64 bg-gray-900 overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
+                            <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-50 group-hover:scale-110 transition duration-500 text-orange-500">
+                                <i class="fa-solid fa-sun"></i>
+                            </div>
+                            <div class="absolute bottom-4 right-4 z-20">
+                                <h4 class="text-2xl font-black text-white mb-1">كتاب الشمس الجديدة</h4>
+                                <div class="flex items-center gap-2 text-yellow-400 text-sm">
+                                    <i class="fa-solid fa-star"></i> 4.7 <span class="text-gray-300">(كلاسيكي)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed">
+                                رحلة "سيفيريان" المنفي من نقابته، في أرض تموت تحت شمس تحتضر، في تحفة أدبية تمزج بين الخيال العلمي والفانتازيا العميقة.
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-gray-500 bg-gray-800 px-3 py-1 rounded-lg">خيال علمي كلاسيكي</span>
+                                <button class="text-purple-400 hover:text-purple-300 font-bold text-sm flex items-center gap-1 group-hover:translate-x-reverse group-hover:translate-x-2 transition">
+                                    اقرأ الآن <i class="fa-solid fa-arrow-left text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- كارت روايتك الخاصة -->
+                    <div class="novel-card glass rounded-2xl overflow-hidden group border-purple-500/50" data-category="mystery">
+                        <div class="relative h-64 bg-gray-900 overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
+                            <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-50 group-hover:scale-110 transition duration-500 text-pink-500">
+                                <i class="fa-solid fa-feather-pointed"></i>
+                            </div>
+                            <div class="absolute top-4 right-4 z-20 flex gap-2">
+                                <span class="bg-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">حصرية</span>
+                            </div>
+                            <div class="absolute bottom-4 right-4 z-20">
+                                <h4 class="text-2xl font-black text-white mb-1">صراع العقول</h4>
+                                <div class="flex items-center gap-2 text-yellow-400 text-sm">
+                                    <i class="fa-solid fa-star"></i> 5.0 <span class="text-gray-300">(جديدة)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed">
+                                تتقاطع طرق المحقق العبقري "كايسل" مع "آيدن" و"ليانا" في قضية غامضة تتخطى حدود العقل البشري وتدخل في صميم الإثارة النفسية المعقدة.
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-gray-500 bg-gray-800 px-3 py-1 rounded-lg">إثارة / تحقيق</span>
+                                <button class="text-purple-400 hover:text-purple-300 font-bold text-sm flex items-center gap-1 group-hover:translate-x-reverse group-hover:translate-x-2 transition">
+                                    اقرأ الآن <i class="fa-solid fa-arrow-left text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <!-- رسالة عند عدم وجود نتائج بحث -->
+                <div id="noResults" class="hidden text-center py-20">
+                    <i class="fa-solid fa-ghost text-6xl text-gray-600 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-300">لم يتم العثور على أية روايات</h3>
+                    <p class="text-gray-500 mt-2">جرب البحث بكلمات مختلفة أو تصفح التصنيفات.</p>
                 </div>
 
-                <!-- رواية 3 -->
-                <div class="glass-card rounded-2xl overflow-hidden group hover:border-purple-500/50 transition duration-300 transform hover:-translate-y-1">
-                    <div class="h-48 bg-gradient-to-br from-emerald-900/60 to-gray-950 flex items-center justify-center relative overflow-hidden">
-                        <span class="text-6xl group-hover:scale-110 transition duration-300">🛡️</span>
-                        <span class="absolute top-3 right-3 bg-emerald-500/20 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/30">خيال علمي</span>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between text-xs text-emerald-400 mb-2 font-semibold">
-                            <span>★ 4.9 (1.2K قراءة)</span>
-                            <span>مستمرة</span>
-                        </div>
-                        <h4 class="text-xl font-bold mb-2 group-hover:text-emerald-300 transition">عبد الظل</h4>
-                        <p class="text-gray-400 text-sm line-clamp-2 mb-4">في عالم مظلم مليء بالمخلوقات المرعبة، يجب على الناجي الوحيد أن يتخطى حدود الظل...</p>
-                        <button class="w-full bg-gray-800 hover:bg-emerald-600 text-gray-200 hover:text-white py-2.5 rounded-xl text-sm font-bold transition duration-200">
-                            اقرأ الفصل الأول
-                        </button>
-                    </div>
-                </div>
             </div>
         </section>
     </main>
 
-    <!-- تذييل الصفحة -->
-    <footer class="glass-card text-center py-8 text-gray-400 text-sm border-t border-gray-800 mt-20">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center space-x-2 space-x-reverse font-bold text-white">
-                <span class="text-purple-400">✦</span>
-                <span>مِجرّة الروايات</span>
+    <!-- الفوتر (تذييل الصفحة) -->
+    <footer class="glass border-t border-gray-800/80 pt-16 pb-8 mt-20 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-book-journal-whills text-purple-500 text-2xl"></i>
+                    <span class="text-xl font-black text-white">مِجرّة الروايات</span>
+                </div>
+                <div class="flex gap-6 text-gray-400">
+                    <a href="#" class="hover:text-purple-400 transition"><i class="fa-brands fa-twitter text-xl"></i></a>
+                    <a href="#" class="hover:text-purple-400 transition"><i class="fa-brands fa-discord text-xl"></i></a>
+                    <a href="#" class="hover:text-purple-400 transition"><i class="fa-brands fa-telegram text-xl"></i></a>
+                </div>
             </div>
-            <p>جميع الحقوق محفوظة &copy; 2026 - صُنع بشغف لعشاق القصص</p>
+            <div class="mt-8 pt-8 border-t border-gray-800/50 text-center text-gray-500 text-sm flex flex-col md:flex-row justify-between items-center">
+                <p>&copy; 2026 مِجرّة الروايات. مبرمجة بشغف في الجزائر.</p>
+                <div class="flex gap-4 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-gray-300">شروط الاستخدام</a>
+                    <a href="#" class="hover:text-gray-300">سياسة الخصوصية</a>
+                </div>
+            </div>
         </div>
     </footer>
 
+    <!-- سكربت التفاعلات (بديل لـ React) -->
+    <script>
+        // 1. تفعيل القائمة في الجوال
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 2. تفعيل أزرار التصنيفات (الفلترة)
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const novelCards = document.querySelectorAll('.novel-card');
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // تغيير شكل الزر النشط
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-purple-600', 'text-white');
+                    b.classList.add('glass', 'text-gray-300');
+                });
+                btn.classList.remove('glass', 'text-gray-300');
+                btn.classList.add('bg-purple-600', 'text-white');
+
+                // تصفية الكروت
+                const filterValue = btn.getAttribute('data-filter');
+                novelCards.forEach(card => {
+                    if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                        card.style.display = 'block';
+                        setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'scale(1)'; }, 50);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.95)';
+                        setTimeout(() => { card.style.display = 'none'; }, 300);
+                    }
+                });
+            });
+        });
+
+        // 3. نظام البحث المباشر
+        const searchInput = document.getElementById('searchInput');
+        const searchInputMobile = document.getElementById('searchInputMobile');
+        const noResults = document.getElementById('noResults');
+
+        function performSearch(query) {
+            let visibleCount = 0;
+            const lowerQuery = query.toLowerCase();
+
+            novelCards.forEach(card => {
+                const textContent = card.innerText.toLowerCase();
+                if (textContent.includes(lowerQuery)) {
+                    card.style.display = 'block';
+                    setTimeout(() => { card.style.opacity = '1'; }, 50);
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                    card.style.opacity = '0';
+                }
+            });
+
+            if (visibleCount === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        searchInput.addEventListener('input', (e) => performSearch(e.target.value));
+        searchInputMobile.addEventListener('input', (e) => performSearch(e.target.value));
+
+        // 4. تأثير السكرول للشريط العلوي
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg', 'shadow-purple-900/20', 'bg-gray-900/90');
+            } else {
+                navbar.classList.remove('shadow-lg', 'shadow-purple-900/20', 'bg-gray-900/90');
+            }
+        });
+    </script>
 </body>
 </html>
-
