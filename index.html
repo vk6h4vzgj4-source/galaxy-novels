@@ -1,91 +1,429 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مجرّة الروايات</title>
-    <!-- استدعاء مكتبة Tailwind CSS للتصميم الاحترافي -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- استدعاء مكتبة الخلفية المتحركة -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Cairo', sans-serif; }
-        .glass-card {
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-    </style>
-</head>
-<body class="text-white min-h-screen flex flex-col justify-between relative overflow-x-hidden">
+import { useState, useEffect, useRef, type ReactNode } from 'react'
+import { novels, genres, type Novel } from './data'
+import { Starfield } from './Starfield'
+import { NovelDetail } from './NovelDetail'
+import './App.css'
 
-    <!-- خلفية الفضاء المتحركة -->
-    <div id="vanta-bg" class="fixed inset-0 -z-10"></div>
+/* ---------- Navbar ---------- */
 
-    <!-- شريط التنقل العلوي -->
-    <header class="glass-card sticky top-0 z-50 border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3 space-x-reverse">
-                <span class="text-3xl">🌌</span>
-                <h1 class="text-2xl font-black bg-gradient-to-r from-purple-400 to-indigo-300 bg-clip-text text-transparent">مجرّة الروايات</h1>
-            </div>
-            <nav class="hidden md:flex space-x-8 space-x-reverse text-sm font-semibold text-gray-300">
-                <a href="#" class="hover:text-purple-400 transition">الرئيسية</a>
-                <a href="#" class="hover:text-purple-400 transition">الروايات</a>
-                <a href="#" class="hover:text-purple-400 transition">التصنيفات</a>
-                <a href="#" class="hover:text-purple-400 transition">الأكثر قراءة</a>
-            </nav>
-            <div>
-                <button class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-purple-500/20 transition transform hover:-translate-y-0.5">
-                    تسجيل الدخول
-                </button>
-            </div>
+function Navbar({ onLogoClick, onSearch }: { onLogoClick: () => void; onSearch: (q: string) => void }) {
+  const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const searchRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    if (searchOpen) {
+      searchRef.current?.focus()
+    }
+  }, [searchOpen])
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      onSearch(searchQuery)
+      setSearchOpen(false)
+    }
+  }
+
+  const links = ['الرئيسية', 'التصنيفات', 'الأكثر رواجًا', 'جديد', 'من نحن']
+
+  return (
+    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+      <div className="navbar-inner">
+        <div className="logo" onClick={onLogoClick} style={{ cursor: 'pointer' }}>
+          <span className="logo-icon">✦</span>
+          <span className="logo-text">مِجرّة الروايات</span>
         </div>
+        <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
+          {links.map((l) => (
+            <a key={l} href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false) }}>
+              {l}
+            </a>
+          ))}
+        </div>
+        <div className="nav-actions">
+          <button
+            className={`search-trigger ${searchOpen ? 'active' : ''}`}
+            onClick={() => setSearchOpen(!searchOpen)}
+            aria-label="بحث"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          </button>
+          <button className="btn-ghost">تسجيل الدخول</button>
+          <button className="btn-primary">انضم إلينا</button>
+        </div>
+        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="القائمة">
+          <span className={`bar ${menuOpen ? 'open' : ''}`}></span>
+          <span className={`bar ${menuOpen ? 'open' : ''}`}></span>
+          <span className={`bar ${menuOpen ? 'open' : ''}`}></span>
+        </button>
+      </div>
+      {/* Expandable search bar */}
+      <div className={`search-bar-container ${searchOpen ? 'open' : ''}`}>
+        <form className="search-form" onSubmit={handleSearchSubmit}>
+          <svg className="search-icon-big" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            ref={searchRef}
+            type="text"
+            className="search-input"
+            placeholder="ابحث عن رواية، كاتب، أو تصنيف..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button type="submit" className="search-submit">بحث</button>
+          <button type="button" className="search-close" onClick={() => setSearchOpen(false)}>✕</button>
+        </form>
+      </div>
+    </nav>
+  )
+}
+
+/* ---------- Hero ---------- */
+
+function Hero({ onBrowse }: { onBrowse: () => void }) {
+  return (
+    <header className="hero">
+      <div className="hero-content">
+        <div className="hero-badge">
+          <span className="pulse-dot"></span>
+          روايات جديدة كل أسبوع
+        </div>
+        <h1 className="hero-title">
+          رحلتك إلى <span className="gradient-text">عوالم لا حصر لها</span> تبدأ هنا
+        </h1>
+        <p className="hero-subtitle">
+          مكتبة رقمية تضم آلاف الروايات العربية والعالمية، من الخيال العلمي إلى الفانتازيا،
+          في تجربة قراءة تأخذك إلى المجرات البعيدة.
+        </p>
+        <div className="hero-actions">
+          <button className="btn-primary btn-lg" onClick={onBrowse}>
+            ابدأ القراءة الآن
+            <span className="btn-arrow">←</span>
+          </button>
+          <button className="btn-ghost btn-lg" onClick={onBrowse}>تصفّح المكتبة</button>
+        </div>
+        <div className="hero-stats">
+          <div className="stat">
+            <span className="stat-num">+5000</span>
+            <span className="stat-label">رواية</span>
+          </div>
+          <div className="stat-divider"></div>
+          <div className="stat">
+            <span className="stat-num">+120K</span>
+            <span className="stat-label">قارئ</span>
+          </div>
+          <div className="stat-divider"></div>
+          <div className="stat">
+            <span className="stat-num">+200</span>
+            <span className="stat-label">كاتب</span>
+          </div>
+        </div>
+      </div>
+      <div className="hero-visual">
+        <div className="planet">
+          <div className="planet-core"></div>
+          <div className="planet-surface"></div>
+          <div className="planet-ring"></div>
+          <div className="planet-ring-2"></div>
+          <div className="planet-glow"></div>
+        </div>
+        <div className="orbit orbit-1"><div className="orbit-dot"></div></div>
+        <div className="orbit orbit-2"><div className="orbit-dot"></div></div>
+        <div className="orbit orbit-3"><div className="orbit-dot"></div></div>
+        <div className="floating-book fb-1">📖</div>
+        <div className="floating-book fb-2">✦</div>
+        <div className="floating-book fb-3">🌙</div>
+      </div>
     </header>
+  )
+}
 
-    <!-- المحتوى الرئيسي للموقع -->
-    <main class="max-w-5xl mx-auto px-4 py-20 text-center my-auto">
-        <div class="glass-card p-10 sm:p-14 rounded-3xl shadow-2xl border border-purple-500/20">
-            <span class="text-6xl mb-6 inline-block">🚀</span>
-            <h2 class="text-4xl sm:text-5xl font-black mb-6 tracking-tight">مرحباً بك في عالم الخيال والتشويق</h2>
-            <p class="text-gray-300 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-                وجهتك الأولى لقراءة أروع الروايات الحصرية، ومتابعة الفصول أولاً بأول بتصميم زجاجي فاخر يناسب شغفك للقراءة.
-            </p>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-8 py-4 rounded-xl shadow-lg transition transform hover:scale-105">
-                    تصفح الروايات الآن
-                </button>
-                <button class="glass-card hover:bg-white/10 text-white font-bold px-8 py-4 rounded-xl transition">
-                    انضم للمجتمع
-                </button>
-            </div>
+/* ---------- Novel Card ---------- */
+
+function NovelCard({ novel, index, onSelect }: { novel: Novel; index: number; onSelect: () => void }) {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const [hovered, setHovered] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  const handleMove = (e: React.MouseEvent) => {
+    const card = cardRef.current
+    if (!card) return
+    const rect = card.getBoundingClientRect()
+    const px = (e.clientX - rect.left) / rect.width - 0.5
+    const py = (e.clientY - rect.top) / rect.height - 0.5
+    setTilt({ x: py * -12, y: px * 14 })
+  }
+
+  return (
+    <div className="novel-card-wrapper" style={{ animationDelay: `${index * 0.1}s` }}>
+      <div
+        ref={cardRef}
+        className={`novel-card ${hovered ? 'hovered' : ''}`}
+        style={{
+          transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+          '--card-color': novel.color,
+        } as React.CSSProperties}
+        onMouseMove={handleMove}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => { setTilt({ x: 0, y: 0 }); setHovered(false) }}
+        onClick={onSelect}
+      >
+        <div className="card-cover">
+          <img src={novel.cover} alt={novel.title} loading="lazy" />
+          <div className="card-overlay">
+            <p className="card-excerpt">{novel.excerpt}</p>
+            <button className="card-read-btn">
+              اقرأ الآن
+              <span className="card-read-icon">←</span>
+            </button>
+          </div>
+          {novel.badge && (
+            <span className="card-badge" style={{ '--badge-color': novel.color } as React.CSSProperties}>
+              {novel.badge}
+            </span>
+          )}
+          <div className="card-glow"></div>
+          <div className="card-shine"></div>
         </div>
-    </main>
+        <div className="card-info">
+          <div className="card-genre">{novel.genre}</div>
+          <h3 className="card-title">{novel.title}</h3>
+          <div className="card-author">{novel.author}</div>
+          <div className="card-meta">
+            <span className="card-rating"><span className="star">★</span>{novel.rating}</span>
+            <span className="card-reads">{novel.reads} قراءة</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
-    <!-- تذييل الصفحة -->
-    <footer class="glass-card text-center py-6 text-gray-400 text-sm border-t border-gray-800">
-        <p>جميع الحقوق محفوظة &copy; 2026 - مجرّة الروايات</p>
+/* ---------- Library Section ---------- */
+
+function Library({ onSelect }: { onSelect: (n: Novel) => void }) {
+  const [activeGenre, setActiveGenre] = useState('الكل')
+  const filtered = activeGenre === 'الكل' ? novels : novels.filter((n) => n.genre === activeGenre)
+  const libraryRef = useRef<HTMLElement>(null)
+
+  return (
+    <section className="library" id="library" ref={libraryRef}>
+      <div className="section-header">
+        <div className="section-label">مكتبتنا</div>
+        <h2 className="section-title">روايات مختارة بعناية</h2>
+        <p className="section-desc">اكتشف عوالم متنوعة من أقلام أمهر الكتّاب العرب والعالم</p>
+      </div>
+      <div className="genre-tabs">
+        {genres.map((g) => (
+          <button
+            key={g}
+            className={`genre-tab ${activeGenre === g ? 'active' : ''}`}
+            onClick={() => setActiveGenre(g)}
+          >
+            {g}
+          </button>
+        ))}
+      </div>
+      <div className="novel-grid">
+        {filtered.map((n, i) => (
+          <NovelCard key={n.id} novel={n} index={i} onSelect={() => onSelect(n)} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ---------- Features Section ---------- */
+
+function Features() {
+  const features = [
+    { icon: '📖', title: 'قراءة بلا حدود', desc: 'تصفّح آلاف الروايات على جهازك في أي وقت، بدون إنترنت بعد التحميل.' },
+    { icon: '✦', title: 'توصيات ذكية', desc: 'نظام يقترح لك روايات بناءً على ذوقك وقراءاتك السابقة.' },
+    { icon: '🌙', title: 'وضع ليلي مريح', desc: 'واجهة مريحة للعين مع إعدادات خط وقابل للتعديل حسب تفضيلك.' },
+    { icon: '⚡', title: 'تحديثات أسبوعية', desc: 'روايات وفصول جديدة تُضاف كل أسبوع لتبقى دائمًا في عالم جديد.' },
+  ]
+  return (
+    <section className="features">
+      <div className="section-header">
+        <div className="section-label">لماذا نحن</div>
+        <h2 className="section-title">تجربة قراءة استثنائية</h2>
+      </div>
+      <div className="features-grid">
+        {features.map((f) => (
+          <div key={f.title} className="feature-card">
+            <div className="feature-icon">{f.icon}</div>
+            <h3>{f.title}</h3>
+            <p>{f.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ---------- Quote Section ---------- */
+
+function QuoteSection() {
+  return (
+    <section className="quote-section">
+      <div className="quote-stars">✦ ✦ ✦</div>
+      <blockquote className="quote-text">
+        «الكتب سفنٌ تُبحر بنا نحو عوالم لم نزرها، ونجومٌ تضيء لنا دروب الخيال»
+      </blockquote>
+      <div className="quote-author">— من أقوال الأدب</div>
+    </section>
+  )
+}
+
+/* ---------- Footer ---------- */
+
+function Footer() {
+  const cols = [
+    { title: 'استكشف', links: ['الأكثر رواجًا', 'جديد', 'التصنيفات', 'الكُتّاب'] },
+    { title: 'الشركة', links: ['من نحن', 'تواصل معنا', 'الوظائف', 'الشركاء'] },
+    { title: 'الدعم', links: ['مركز المساعدة', 'الأسئلة الشائعة', 'سياسة الخصوصية', 'شروط الاستخدام'] },
+  ]
+  return (
+    <footer className="footer">
+      <div className="footer-inner">
+        <div className="footer-brand">
+          <div className="logo">
+            <span className="logo-icon">✦</span>
+            <span className="logo-text">مِجرّة الروايات</span>
+          </div>
+          <p className="footer-tagline">وجهتك الأولى لعوالم بلا حدود.</p>
+          <div className="footer-socials">
+            <a href="#" aria-label="تويتر">𝕏</a>
+            <a href="#" aria-label="انستغرام">⬡</a>
+            <a href="#" aria-label="فيسبوك">f</a>
+          </div>
+        </div>
+        <div className="footer-links">
+          {cols.map((c) => (
+            <div key={c.title} className="footer-col">
+              <h4>{c.title}</h4>
+              {c.links.map((l) => <a key={l} href="#">{l}</a>)}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="footer-bottom">
+        <span>© 2026 مِجرّة الروايات. جميع الحقوق محفوظة.</span>
+        <span className="footer-made">صُنع بشغف تحت النجوم ✦</span>
+      </div>
     </footer>
+  )
+}
 
-    <!-- تشغيل الخلفية المتحركة -->
-    <script>
-        VANTA.NET({
-            el: "#vanta-bg",
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0x6366f1,
-            backgroundColor: 0x030712,
-            points: 12.00,
-            maxDistance: 22.00,
-            spacing: 17.00
-        })
-    </script>
-</body>
-</html>
+/* ---------- Search Results Section ---------- */
+
+function SearchResults({ query, onSelect, onClear }: { query: string; onSelect: (n: Novel) => void; onClear: () => void }) {
+  const q = query.trim().toLowerCase()
+  const results = novels.filter(
+    (n) =>
+      n.title.toLowerCase().includes(q) ||
+      n.author.toLowerCase().includes(q) ||
+      n.genre.toLowerCase().includes(q) ||
+      n.excerpt.toLowerCase().includes(q)
+  )
+
+  return (
+    <section className="search-results" id="search-results">
+      <div className="search-results-header">
+        <button className="search-back-btn" onClick={onClear}>
+          <span>→</span>
+          رجوع
+        </button>
+        <div className="search-results-title">
+          نتائج البحث عن: <span className="search-query-display">«{query}»</span>
+        </div>
+        <div className="search-results-count">{results.length} نتيجة</div>
+      </div>
+      {results.length === 0 ? (
+        <div className="search-empty">
+          <div className="search-empty-icon">🔍</div>
+          <h3>لا توجد نتائج</h3>
+          <p>لم نعثر على روايات تطابق بحثك. جرّب كلمات أخرى.</p>
+        </div>
+      ) : (
+        <div className="novel-grid">
+          {results.map((n, i) => (
+            <NovelCard key={n.id} novel={n} index={i} onSelect={() => onSelect(n)} />
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+/* ---------- App ---------- */
+
+function App(): ReactNode {
+  const [selectedNovel, setSelectedNovel] = useState<Novel | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const scrollToLibrary = () => {
+    document.getElementById('library')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const goHome = () => {
+    setSelectedNovel(null)
+    setSearchQuery('')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleSearch = (q: string) => {
+    setSearchQuery(q)
+    setSelectedNovel(null)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  if (selectedNovel) {
+    return (
+      <>
+        <Starfield />
+        <NovelDetail novel={selectedNovel} onBack={() => setSelectedNovel(null)} />
+      </>
+    )
+  }
+
+  return (
+    <>
+      <Starfield />
+      <Navbar onLogoClick={goHome} onSearch={handleSearch} />
+      <main>
+        {searchQuery ? (
+          <SearchResults
+            query={searchQuery}
+            onSelect={setSelectedNovel}
+            onClear={() => setSearchQuery('')}
+          />
+        ) : (
+          <>
+            <Hero onBrowse={scrollToLibrary} />
+            <Library onSelect={setSelectedNovel} />
+            <Features />
+            <QuoteSection />
+          </>
+        )}
+      </main>
+      <Footer />
+    </>
+  )
+}
+
+export default App
